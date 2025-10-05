@@ -10,4 +10,7 @@ export class Score {
 
     @Column()
     points: number;
+
+    @Column({ type: 'timestamp' })
+    createdAt: Date;
 }

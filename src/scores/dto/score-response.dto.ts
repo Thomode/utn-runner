@@ -12,4 +12,7 @@ export class ScoreResponseDto {
 
     @ApiProperty()
     position: number;
+
+    @ApiProperty()
+    createdAt: Date;
 }

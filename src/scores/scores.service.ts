@@ -15,12 +15,22 @@ export class ScoresService {
   async create(scoreDto: CreateScoreDto): Promise<ScoreResponseDto> {
     const player = scoreDto.player.toUpperCase();
 
+    // Validación de longitud del nombre
+    if (player.length > 10) {
+      throw new BadRequestException(`El nombre del jugador no debe superar los 10 caracteres`);
+    }
+
     const exists = await this.scoreRepo.findOne({ where: { player } });
     if (exists) {
       throw new BadRequestException(`El jugador ${player} ya existe`);
     }
 
-    const newScore = this.scoreRepo.create({ ...scoreDto, player });
+    // Validación de puntos
+    if (scoreDto.points <= 0) {
+      throw new BadRequestException(`Los puntos deben ser mayores a 0`);
+    }
+
+    const newScore = this.scoreRepo.create({ ...scoreDto, player, createdAt: new Date() });
     const saved = await this.scoreRepo.save(newScore);
 
     // Calcular posición del nuevo jugador
@@ -35,6 +45,7 @@ export class ScoresService {
       player: saved.player,
       points: saved.points,
       position,
+      createdAt: saved.createdAt,
     };
 
     return response;
@@ -51,6 +62,7 @@ export class ScoresService {
       player: score.player,
       points: score.points,
       position: index + 1, // posición según el orden
+      createdAt: score.createdAt,
     }));
   }
 
